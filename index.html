@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ml">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chat On</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#050b18;color:#fff;height:100vh}
+.app{max-width:520px;margin:auto;height:100vh;display:flex;flex-direction:column;background:linear-gradient(180deg,#071224,#030712)}
+header{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid #1b2a40}
+.logo{font-size:22px;font-weight:800}.logo span{color:#4d8dff}button{border:0;color:#fff;background:#13243b;border-radius:12px;padding:10px 13px;font-size:15px}
+#chat{flex:1;overflow:auto;padding:18px 14px}.welcome{text-align:center;margin:70px 10px 20px}.bot{font-size:48px}.welcome h1{margin:8px 0}.welcome p{color:#9eabc0}
+.msg{display:flex;margin:12px 0}.msg.user{justify-content:flex-end}.bubble{max-width:82%;padding:12px 14px;border-radius:17px;line-height:1.45;white-space:pre-wrap}.botmsg{background:#132238;border:1px solid #203550}.usermsg{background:#1769e8}
+footer{padding:10px;border-top:1px solid #1b2a40;display:flex;gap:8px}.input{flex:1;background:#101d31;border:1px solid #243750;color:#fff;border-radius:22px;padding:13px 15px;outline:0}.send{border-radius:50%;width:48px;height:48px;background:#1677ff;font-size:20px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.chip{font-size:13px;padding:9px 11px;border-radius:20px}
+</style></head>
+<body><div class="app">
+<header><div class="logo">Chat <span>On</span></div><button onclick="newChat()">＋ New</button></header>
+<main id="chat"><div class="welcome" id="welcome"><div class="bot">🤖</div><h1>Chat On</h1><p>എന്തും ചോദിക്കൂ… ഞാൻ ഇവിടെ ഉണ്ട്.</p>
+<div class="chips"><button class="chip" onclick="quick('എനിക്ക് പഠിക്കാൻ സഹായിക്കൂ')">📚 Study Help</button><button class="chip" onclick="quick('ഒരു business idea തരൂ')">💡 Ideas</button><button class="chip" onclick="quick('Malayalam-ൽ സംസാരിക്കാം')">🇮🇳 Malayalam</button></div></div></main>
+<footer><input id="input" class="input" placeholder="Message..." autocomplete="off"><button class="send" onclick="send()">➤</button></footer>
+</div>
+<script>
+const chat=document.getElementById('chat'),input=document.getElementById('input'),welcome=document.getElementById('welcome');
+function add(text,who){welcome.style.display='none';const row=document.createElement('div');row.className='msg '+who;const b=document.createElement('div');b.className='bubble '+(who==='user'?'usermsg':'botmsg');b.textContent=text;row.appendChild(b);chat.appendChild(row);chat.scrollTop=chat.scrollHeight}
+async function send(){const q=input.value.trim();if(!q)return;add(q,'user');input.value='';const id='loading-'+Date.now();add('ചിന്തിക്കുന്നു…','bot');const bubble=chat.lastElementChild.querySelector('.bubble');try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q})});const data=await r.json();bubble.textContent=r.ok?data.reply:(data.error||'Something went wrong.');}catch(e){bubble.textContent='Server connect ചെയ്യാൻ കഴിഞ്ഞില്ല.';}chat.scrollTop=chat.scrollHeight}
+function quick(q){input.value=q;send()}function newChat(){location.reload()}input.addEventListener('keydown',e=>{if(e.key==='Enter')send()})
+</script></body></html>
